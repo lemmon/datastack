@@ -57,8 +57,11 @@ class DataStack implements \Iterator, \ArrayAccess, \Countable
     }
 
 
-    function query($query)
+    function getFields($field)
     {
+        return array_map(function($item) use ($field){
+            return $item[$field];
+        }, $this->_data);
     }
 
 
@@ -66,12 +69,46 @@ class DataStack implements \Iterator, \ArrayAccess, \Countable
     {
         return new $this(array_filter(array_map(function($item) use ($filters) {
             foreach ($filters as $filter => $value) {
-                if (!($item = _filter($item, explode('.', $filter), $value))) {
+                if (!($item = $this->_filter($item, explode('.', $filter), $value))) {
                     return FALSE;
                 }
             }
             return $item;
         }, $this->_data)));
+    }
+
+
+    private function _filter($item, array $filter, $value) {
+        if (!$this->_isArrayLike($item)) {
+            return FALSE;
+        }
+        $current = array_shift($filter);
+        if ('*' == $current) {
+            return array_filter(array_map(function($item) use ($filter, $value) {
+                return _filter($item, $filter, $value);
+            }, $item));
+        } elseif (isset($item[$current])) {
+            if ($filter) {
+                if ($this->_isArrayLike($item[$current]) and $res = _filter($item[$current], $filter, $value)) {
+                    $item[$current] = $res;
+                    return $item;
+                } else {
+                    return FALSE;
+                }
+            } elseif ($item[$current] == $value) {
+                return $item;
+            } else {
+                return FALSE;
+            }
+        } else {
+            return FALSE;
+        }
+    }
+
+
+    private function _isArrayLike($item)
+    {
+        return is_array($item) or (is_object($item) and $item instanceof \ArrayAccess);
     }
 
 
