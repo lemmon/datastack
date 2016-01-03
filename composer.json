@@ -13,7 +13,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Lemmon\\": "src/Lemmon"
+            "Lemmon\\DataStack": "src/Lemmon"
         }
     },
     "minimum-stability": "dev"
