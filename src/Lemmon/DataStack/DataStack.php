@@ -50,6 +50,18 @@ class DataStack implements \Iterator, \ArrayAccess, \Countable
     }
 
 
+    function sum($field = NULL)
+    {
+        $res = $this['*.' . $field];
+        return 0;
+    }
+
+
+    function query($query)
+    {
+    }
+
+
     function filter($filters)
     {
         return new $this(array_filter(array_map(function($item) use ($filters) {
