@@ -25,6 +25,12 @@ class DataStack implements \Iterator, \ArrayAccess, \Countable
     }
 
 
+    function getKeys()
+    {
+        return $this->_keys;
+    }
+
+
     function getArray()
     {
         return $this->_data;
@@ -40,11 +46,10 @@ class DataStack implements \Iterator, \ArrayAccess, \Countable
     function shuffle()
     {
         $res = [];
-        if ($keys = $this->_keys) {
-            shuffle($keys);
-            foreach ($keys as $key) {
-                $res[$key] = $this->_data[$key];
-            }
+        $keys = $this->_keys;
+        shuffle($keys);
+        foreach ($keys as $key) {
+            $res[$key] = $this->_data[$key];
         }
         return new $this($res);
     }
@@ -52,16 +57,15 @@ class DataStack implements \Iterator, \ArrayAccess, \Countable
 
     function sum($field = NULL)
     {
-        $res = $this['*.' . $field];
-        return 0;
+        return array_sum($field ? $this->getFields($field)->getArray() : $this->_data);
     }
 
 
     function getFields($field)
     {
-        return array_map(function($item) use ($field){
+        return new $this(array_map(function($item) use ($field) {
             return $item[$field];
-        }, $this->_data);
+        }, $this->_data));
     }
 
 
