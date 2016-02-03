@@ -82,7 +82,8 @@ class DataStack implements \Iterator, \ArrayAccess, \Countable
     }
 
 
-    private function _filter($item, array $filter, $value) {
+    private function _filter($item, array $filter, $value)
+    {
         if (!$this->_isArrayLike($item)) {
             return FALSE;
         }
@@ -136,7 +137,6 @@ class DataStack implements \Iterator, \ArrayAccess, \Countable
 
     function key()
     {
-        return $this->_keys[$this->_i];
         return $this->_keys[$this->_i];
     }
 
