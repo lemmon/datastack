@@ -61,10 +61,20 @@ class DataStack implements \Iterator, \ArrayAccess, \Countable
     }
 
 
+    function _getField($res, $field)
+    {
+        $field = explode('.', $field);
+        while ($field and $this->_isArrayLike($res) and $_field = array_shift($field) and isset($res[$_field])) {
+            $res = $res[$_field];
+        }
+        return !$field ? $res : NULL;
+    }
+
+
     function getFields($field)
     {
         return new $this(array_map(function($item) use ($field) {
-            return $item[$field];
+            return $this->_getField($item, $field);
         }, $this->_data));
     }
 
@@ -82,29 +92,40 @@ class DataStack implements \Iterator, \ArrayAccess, \Countable
     }
 
 
-    private function _filter($item, array $filter, $value)
+    private function _filter($item, array $filter, $value, $op = 'eq')
     {
         if (!$this->_isArrayLike($item)) {
             return FALSE;
         }
+        // current value
         $current = array_shift($filter);
+        // operator
+        if ('!' == $current{0}) {
+            $current = substr($current, 1);
+            $op = 'neq';
+        }
+        // filter
         if ('*' == $current) {
             return array_filter(array_map(function($item) use ($filter, $value) {
-                return _filter($item, $filter, $value);
+                return _filter($item, $filter, $value, $op);
             }, $item));
         } elseif (isset($item[$current])) {
             if ($filter) {
-                if ($this->_isArrayLike($item[$current]) and $res = _filter($item[$current], $filter, $value)) {
+                if ($this->_isArrayLike($item[$current]) and $res = _filter($item[$current], $filter, $value, $op)) {
                     $item[$current] = $res;
                     return $item;
                 } else {
                     return FALSE;
                 }
-            } elseif ($item[$current] == $value) {
+            } elseif ('eq' === $op && $item[$current] == $value) {
+                return $item;
+            } elseif ('neq' === $op && $item[$current] != $value) {
                 return $item;
             } else {
                 return FALSE;
             }
+        } elseif ('neq' === $op and NULL !== $value) {
+            return $item;
         } else {
             return FALSE;
         }
