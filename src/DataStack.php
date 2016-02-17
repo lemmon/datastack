@@ -55,6 +55,19 @@ class DataStack implements \Iterator, \ArrayAccess, \Countable
     }
 
 
+    function slice(int $a, int $b = NULL)
+    {
+        if (isset($b)) {
+            $offset = $a;
+            $length = $b;
+        } else {
+            $offset = 0;
+            $length = $a;
+        }
+        return new $this(array_slice($this->_data, $offset, $length, TRUE));
+    }
+
+
     function sum($field = NULL)
     {
         return array_sum($field ? $this->getFields($field)->getArray() : $this->_data);
@@ -106,12 +119,12 @@ class DataStack implements \Iterator, \ArrayAccess, \Countable
         }
         // filter
         if ('*' == $current) {
-            return array_filter(array_map(function($item) use ($filter, $value) {
-                return _filter($item, $filter, $value, $op);
+            return array_filter(array_map(function($item) use ($filter, $value, $op) {
+                return $this->_filter($item, $filter, $value, $op);
             }, $item));
         } elseif (isset($item[$current])) {
             if ($filter) {
-                if ($this->_isArrayLike($item[$current]) and $res = _filter($item[$current], $filter, $value, $op)) {
+                if ($this->_isArrayLike($item[$current]) and $res = $this->_filter($item[$current], $filter, $value, $op)) {
                     $item[$current] = $res;
                     return $item;
                 } else {
