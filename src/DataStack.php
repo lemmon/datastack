@@ -31,6 +31,12 @@ class DataStack implements \Iterator, \ArrayAccess, \Countable
     }
 
 
+    function getData()
+    {
+        return $this->_data;
+    }
+
+
     function getArray()
     {
         return $this->_data;
@@ -163,9 +169,9 @@ class DataStack implements \Iterator, \ArrayAccess, \Countable
     }
 
 
-    function current()
+    function current($yo = TRUE)
     {
-        return $this->_data[$this->_keys[$this->_i]];
+        return $yo ? $this->offsetGet($this->_keys[$this->_i]) : $this->_data[$this->_keys[$this->_i]];
     }
 
 
@@ -194,7 +200,7 @@ class DataStack implements \Iterator, \ArrayAccess, \Countable
 
     function offsetGet($offset)
     {
-        return is_array($res = $this->_data[$offset]) ? new self($res) : $res;
+        return is_array($_ = $this->_data[$offset]) ? new self($_) : $_;
     }
 
 
