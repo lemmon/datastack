@@ -25,6 +25,12 @@ class DataStack implements \Iterator, \ArrayAccess, \Countable
     }
 
 
+    function getLast()
+    {
+        return $this->_data ? $this->offsetGet($this->_keys[$this->_n - 1]) : NULL;
+    }
+
+
     function getKeys()
     {
         return $this->_keys;
