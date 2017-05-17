@@ -101,8 +101,8 @@ class DataStack implements \Iterator, \ArrayAccess, \Countable
     function _getField($res, $field)
     {
         $field = explode('.', $field);
-        while ($field and $this->_isArrayLike($res) and $_field = array_shift($field) and isset($res[$_field])) {
-            $res = $res[$_field];
+        while ($field and $this->_isArrayLike($res) and $_field = array_shift($field)) {
+            $res = $res[$_field] ?? NULL;
         }
         return !$field ? $res : NULL;
     }
@@ -116,7 +116,7 @@ class DataStack implements \Iterator, \ArrayAccess, \Countable
     }
 
 
-    function filter($filters)
+    function filter($filters = [])
     {
         return new $this(array_filter(array_map(function($item) use ($filters) {
             foreach ($filters as $filter => $value) {
