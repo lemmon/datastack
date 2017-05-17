@@ -73,6 +73,12 @@ class DataStack implements \Iterator, \ArrayAccess, \Countable
     }
 
 
+    function unique()
+    {
+      return new $this(array_unique($this->_data));
+    }
+
+
     function slice(int $a, int $b = NULL)
     {
         if (isset($b)) {
